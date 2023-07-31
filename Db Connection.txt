@@ -1,0 +1,60 @@
+1--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#H2 Database
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+#url
+#http://localhost:8080/h2-console/login.jsp?jsessionid=66e59ddb87e939c63c662b38daa1df92
+#spring.datasource.url=jdbc:h2:mem:testdb
+#spring.datasource.url=jdbc:h2:mem:94755f89-37e2-4628-8c5d-36f001429864
+#spring.datasource.url=jdbc:h2:~/test
+
+
+
+2---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Mysql DataBase
+
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/amrit
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.show-sql: true
+
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.19</version>
+</dependency>
+3---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Postgre 
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/amrit
+spring.datasource.username=postgres
+spring.datasource.password=amrit
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql: true
+
+<dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.3.1</version>
+    </dependency>
+4---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Oracle database
+
+# OracleDB connection settings
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.username=system
+spring.datasource.password=system
+#spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql: true
