@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Download By File Number</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid px-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <form id="Dwn_Report" name="DwnByFilerfno" autocomplete="off">
+                    <div id="body_container">
+                        <table width="100%" align="center" cellspacing="0" cellpadding="3">
+                            <tr>
+                                <td>
+                                    <table width="80%" align="center" class="formTable">
+                                        <tr>
+                                            <th colspan="3" align="center">
+                                                <BR>
+                                                <font class="table_heading"> Download By File Number </font>
+                                                <BR><BR><BR>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td align="center">
+                                                <b>File Number 1 </b>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="filerfnoInput" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" style="text-align: center">
+                                                <button id="downloadBtn" class="custombutton1" style="width:auto">Download Data</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <table id="dataContainer" border="1">
+            <thead>
+                <tr>
+                    <th>Filerfno</th>
+                    <th>Service ID</th>
+                    <th>Field Index</th>
+                    <th>Field ID</th>
+                    <th>Field Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Thymeleaf iteration to render initial table rows -->
+                <tr th:each="dataModel : ${dataList}">
+                    <td th:text="${dataModel.filerfno}"></td>
+                    <td th:text="${dataModel.service_id}"></td>
+                    <td th:text="${dataModel.field_indx}"></td>
+                    <td th:text="${dataModel.field_id}"></td>
+                    <td th:text="${dataModel.field_value}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $('#Dwn_Report').submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var filerfno = $('#filerfnoInput').val(); // Get the value of filerfno input field
+
+                $.ajax({
+                    type: "POST",
+                    url: "/DownloadByFilerfno",
+                    data: { filerfno: filerfno },
+                    success: function(response) {
+                        updateTable(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+
+            function updateTable(data) {
+                var tableBody = $('#dataContainer tbody');
+                tableBody.empty(); // Clear previous data
+
+                if (data.length > 0) {
+                    $.each(data, function(index, item) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(item.filerfno));
+                        row.append($('<td>').text(item.service_id));
+                        row.append($('<td>').text(item.field_indx));
+                        row.append($('<td>').text(item.field_id));
+                        row.append($('<td>').text(item.field_value));
+                        tableBody.append(row);
+                    });
+                } else {
+                    tableBody.append($('<tr>').append($('<td colspan="5">').text('No data available')));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

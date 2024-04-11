@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Download By File Number</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <style>
+        .table_heading {
+            font-weight: bold;
+            font-size: larger;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <form id="downloadForm" name="downloadByFileNumberForm" autocomplete="off">
+                    <div class="form-group">
+                        <label for="fileNumberInput" class="table_heading">File Number:</label>
+                        <input type="text" id="fileNumberInput" class="form-control" />
+                    </div>
+                    <div class="text-center">
+                        <button id="downloadBtn" class="btn btn-primary">Download Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+       <div class="container">
+        <div class="card">
+            <div class="card-body">
+    <div class="container mt-3">
+        <table id="dataTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Filer Number</th>
+                    <th>Service ID</th>
+                    <th>Field Index</th>
+                    <th>Field ID</th>
+                    <th>Field Value</th>
+                </tr>
+            </thead>
+            <tbody id="dataContainer">
+                <!-- Thymeleaf iteration to render initial table rows -->
+                <tr th:each="dataModel : ${dataList}">
+                    <td th:text="${dataModel.filerfno}"></td>
+                    <td th:text="${dataModel.service_id}"></td>
+                    <td th:text="${dataModel.field_indx}"></td>
+                    <td th:text="${dataModel.field_id}"></td>
+                    <td th:text="${dataModel.field_value}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+  </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            var dataTable = $('#dataTable').DataTable({
+                pageLength: 10,
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthChange: false,
+                dom: 'Bfrtip', // Specify the layout of DataTables with buttons
+                buttons: [
+                    'copy', 'csv', 'pdf' // Add buttons for copying, exporting to CSV, and exporting to PDF
+                ],
+                columns: [
+                    { data: 'filerfno' },
+                    { data: 'service_id' },
+                    { data: 'field_indx' }, // Ensure that this matches your data structure
+                    { data: 'field_id' },
+                    { data: 'field_value' }
+                ]
+            });
+
+            $('#downloadForm').submit(function(e) {
+                e.preventDefault();
+
+                var fileNumber = $('#fileNumberInput').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/DownloadByFilerfno",
+                    data: { filerfno: fileNumber },
+                    success: function(response) {
+                        updateTable(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+
+            function updateTable(data) {
+                dataTable.clear().rows.add(data).draw();
+            }
+        });
+    </script>
+</body>
+</html>
