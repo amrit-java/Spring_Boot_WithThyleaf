@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Upload</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center; 
+            align-items: flex-start; 
+            padding-top: 20px; 
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 60px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            background-color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+            justify-content: center;
+        }
+
+        .message-success {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .message-error {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>File Upload</h3>
+        <form method="post" enctype="multipart/form-data" th:action="@{/upload}">
+            <label for="file">Choose a file:</label>
+            <input type="file" id="file" name="file" required>
+            <button type="submit">Upload</button>
+        </form>
+
+        <div>
+            <p th:if="${messageType == 'success'}" th:class="'message-success'" th:text="${message}"></p>
+            <p th:if="${messageType == 'error'}" th:class="'message-error'" th:text="${message}"></p>
+        </div>
+    </div>
+</body>
+</html>
