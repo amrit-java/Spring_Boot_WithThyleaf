@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crop Image</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <style>
+        #crop-container {
+            max-width: 15%;
+            margin: auto;
+            text-align: center;
+        }
+        img {
+            max-width: 80%;
+        }
+        #crop-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        #save-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            display: none;
+        }
+        #save-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="crop-container">
+    <h1>Crop Image</h1>
+    <div id="crop-area">
+        <img id="image" th:src="@{'/images/view/' + ${image.id}}" alt="Image to crop">
+    </div>
+    <button id="crop-btn">Crop</button>
+
+    <!-- Preview container -->
+    <div id="preview-container" style="display:none;">
+        <h3>Cropped Image:</h3>
+        <img id="cropped-preview" style="max-width: 100%; border: 1px solid #ccc;">
+        <button id="save-btn">Save</button>
+    </div>
+
+    <!-- Hidden form for submitting data -->
+    <form id="crop-form" th:action="@{/images/save}" method="POST" style="display:none;">
+        <input type="hidden" id="image-id" name="id" th:value="${image.id}">
+        <input type="hidden" id="croppedData" name="croppedData">
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+    let cropper;
+    let croppedCanvas;
+
+    const image = document.getElementById('image');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('cropped-preview');
+    const cropArea = document.getElementById('crop-area');
+    const cropBtn = document.getElementById('crop-btn');
+    const saveBtn = document.getElementById('save-btn');
+
+    image.onload = function () {
+        cropper = new Cropper(image, {
+            aspectRatio: 1,
+            viewMode: 1,
+            responsive: true,
+        });
+    };
+
+    cropBtn.addEventListener('click', () => {
+        if (cropper) {
+            croppedCanvas = cropper.getCroppedCanvas();
+            if (croppedCanvas) {
+                // Hide the cropping area and the Crop button
+                cropArea.style.display = 'none';
+                cropBtn.style.display = 'none';
+
+                // Show the cropped preview
+                previewContainer.style.display = 'block';
+                previewImage.src = croppedCanvas.toDataURL();
+
+                // Show the Save button
+                saveBtn.style.display = 'inline-block';
+            } else {
+                alert("Failed to crop the image.");
+            }
+        }
+    });
+
+    saveBtn.addEventListener('click', () => {
+        if (croppedCanvas) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            croppedCanvas.toBlob((blob) => {
+                const formData = new FormData();
+                formData.append('id', document.getElementById('image-id').value);
+                formData.append('croppedData', blob);
+
+                fetch('/images/save', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/images';
+                    } else {
+                        alert('Failed to save image');
+                    }
+                })
+                .catch((error) => {
+                    alert('Error saving image.');
+                    console.error(error);
+                })
+                .finally(() => {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
